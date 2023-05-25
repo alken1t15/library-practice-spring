@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Страница со списком всех людей</title>
+</head>
+<body>
+<div th:each="people : ${peoples}">
+    <a href="//"><span th:text="${people.getLNM()}"></span>, <span th:text="${people.getDateBorn()}"></span></a>
+</div>
+<a th:href="@{/people/new}">Добавить человека</a>
+</body>
+</html>
