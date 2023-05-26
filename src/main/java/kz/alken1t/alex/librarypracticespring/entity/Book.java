@@ -1,6 +1,9 @@
 package kz.alken1t.alex.librarypracticespring.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -18,9 +21,11 @@ public class Book {
     @JoinColumn(name = "people_id")
     private People people;
 
+    @NotEmpty(message = "Поле должно быть заполнено")
     private String name;
-
+    @NotEmpty(message = "Поле должно быть заполнено")
     private String author;
-
-    private LocalDate year;
+    @NotNull(message = "Поле должно быть заполнено")
+    @Min(value = 0,message = "Значение должно быть больше 0")
+    private Integer year;
 }

@@ -6,8 +6,9 @@
 </head>
 <body>
 <div th:each="people : ${peoples}">
-    <a href="//"><span th:text="${people.getLNM()}"></span>, <span th:text="${people.getDateBorn()}"></span></a>
+    <a th:href="@{/people/{id}(id=${people.getId()})}"><span th:text="${people.getLNM()}"></span>, <span th:text="${people.getDateBorn()}"></span></a>
 </div>
+<hr/>
 <a th:href="@{/people/new}">Добавить человека</a>
 </body>
 </html>
