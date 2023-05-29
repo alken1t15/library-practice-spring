@@ -12,7 +12,8 @@
     <b>Книги:</b>
 </div>
 <div th:if="${!people.getBookList().isEmpty()}" th:each="book : ${people.getBookList()}">
-    <p><span th:text="${book.getName()}"></span>, <span th:text="${book.getAuthor()}"></span>, <span th:text="${book.getYear()}"></span></p>
+    <p style="color: red" th:if="${book.getOverdueDeliveryDate()}"><span th:text="${book.getName()}"></span>, <span th:text="${book.getAuthor()}"></span>, <span th:text="${book.getYear()}"></span></p>
+    <p th:if="${!book.getOverdueDeliveryDate()}"><span th:text="${book.getName()}"></span>, <span th:text="${book.getAuthor()}"></span>, <span th:text="${book.getYear()}"></span></p>
 </div>
 <hr/>
 <form th:action="@{/people/{id}/edit(id=${people.getId()})}">

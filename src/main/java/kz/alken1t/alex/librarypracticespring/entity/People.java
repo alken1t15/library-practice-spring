@@ -5,15 +5,15 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
-import org.hibernate.annotations.Check;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Table(name = "people")
-@Data
+@Getter
+@Setter
 public class People {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +28,6 @@ public class People {
 
     @Column(name = "date_born")
     @NotNull(message = "Поле должно быть заполнено")
-    @Min(value = 0,message = "Значение должно быть больше 0")
+    @Min(value = 0, message = "Значение должно быть больше 0")
     private Integer dateBorn;
 }

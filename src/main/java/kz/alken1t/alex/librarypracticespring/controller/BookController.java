@@ -3,8 +3,9 @@ package kz.alken1t.alex.librarypracticespring.controller;
 import jakarta.validation.Valid;
 import kz.alken1t.alex.librarypracticespring.entity.Book;
 import kz.alken1t.alex.librarypracticespring.entity.People;
-import kz.alken1t.alex.librarypracticespring.repository.BookRepository;
-import kz.alken1t.alex.librarypracticespring.repository.PeopleRepository;
+import kz.alken1t.alex.librarypracticespring.service.BookService;
+import kz.alken1t.alex.librarypracticespring.service.PeopleService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,91 +15,100 @@ import java.util.List;
 
 @Controller
 @RequestMapping(path = "/books")
+@AllArgsConstructor
 public class BookController {
 
-    private PeopleRepository peopleRepository;
+    private final BookService bookService;
 
-    private BookRepository bookRepository;
+    private final PeopleService peopleService;
 
-    public BookController(PeopleRepository peopleRepository, BookRepository bookRepository) {
-        this.peopleRepository = peopleRepository;
-        this.bookRepository = bookRepository;
-    }
 
     @GetMapping
-    public String bookPage(Model model){
-        List<Book> books = bookRepository.findAll();
+    public String bookPage(@RequestParam(name = "page", required = false) Integer page
+            , @RequestParam(name = "books_per_page", required = false) Integer perPage
+            , @RequestParam(name = "sort_by_year", required = false) String sort
+            , Model model) {
+        List<Book> books = bookService.mainPage(page, perPage, sort);
         model.addAttribute("books", books);
         return "book/book_main_page";
     }
 
     @GetMapping("/new")
-    public String bookNew(Model model){
+    public String bookNew(Model model) {
         model.addAttribute("book", new Book());
         return "book/book_new_page";
     }
 
     @PostMapping
     public String bookNewCreate(@ModelAttribute("book") @Valid Book book
-            , BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
+            , BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             return "book/book_new_page";
         }
-        bookRepository.save(book);
+        bookService.save(book);
         return "redirect:/books";
     }
 
     @GetMapping("/{id}")
     public String profileBook(@PathVariable Long id,
-                           Model model){
-        Book book = bookRepository.findById(id).orElseThrow();
-        List<People> peoples = peopleRepository.findAll();
-        model.addAttribute("book",book);
-        model.addAttribute("peoples",peoples);
+                              Model model) {
+        Book book = bookService.findById(id);
+        List<People> peoples = peopleService.findAll();
+        model.addAttribute("book", book);
+        model.addAttribute("peoples", peoples);
         return "book/book_profile_page";
     }
 
     @PutMapping
-    public String profileBook(@RequestParam(name = "id_book") Long idBook, @RequestParam("id_people") Long idPeople){
-        Book book = bookRepository.findById(idBook).orElseThrow();
-        People people = peopleRepository.findById(idPeople).orElseThrow();
-        book.setPeople(people);
-        bookRepository.save(book);
+    public String profileBook(@RequestParam(name = "id_book") Long idBook, @RequestParam("id_people") Long idPeople) {
+        bookService.takeBookPeople(idBook, idPeople);
         return "redirect:/books";
     }
 
     @PostMapping("/clear")
-    public String profileBook(@RequestParam(name = "id") Long id){
-        Book book = bookRepository.findById(id).orElseThrow();
-        book.setPeople(null);
-        bookRepository.save(book);
+    public String profileBook(@RequestParam(name = "id") Long id) {
+        bookService.giveBookPeople(id);
         return "redirect:/books";
     }
 
     @DeleteMapping
-    public String profileBookDelete(@RequestParam(name = "id") Long id){
-        Book book = bookRepository.findById(id).orElseThrow();
-        bookRepository.delete(book);
+    public String profileBookDelete(@RequestParam(name = "id") Long id) {
+        bookService.deleteById(id);
         return "redirect:/books";
     }
 
 
     @GetMapping("/{id}/edit")
     public String editBook(@PathVariable Long id,
-                             Model model){
-        Book book = bookRepository.findById(id).orElseThrow();
-        model.addAttribute("book",book);
+                           Model model) {
+        Book book = bookService.findById(id);
+        model.addAttribute("book", book);
         return "book/book_edit_page";
     }
 
     @PatchMapping
     public String editBook(@ModelAttribute("book") @Valid Book book,
-                             BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
+                           BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             return "book/book_edit_page";
         }
-        bookRepository.save(book);
+        bookService.save(book);
         return "redirect:/books";
     }
 
+    @GetMapping(path = "/search")
+    public String searchPage(@RequestParam(name = "name_book", required = false) String bookName, Model model) {
+        if (bookName != null) {
+            if (!bookName.isEmpty()) {
+                Book book = bookService.findBookByNameStartingWith(bookName);
+                if (book == null) {
+                    model.addAttribute("noBook", "true");
+                }
+                model.addAttribute("book", book);
+            } else {
+                model.addAttribute("noBook", "true");
+            }
+        }
+        return "book/book_search_page";
+    }
 }

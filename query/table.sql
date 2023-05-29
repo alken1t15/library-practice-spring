@@ -8,7 +8,9 @@ create table book(
   people_id int8 references people(id) ON DELETE SET DEFAULT,
   "name" varchar(100),
   author varchar(100),
-  "year" int4
+  "year" int4,
+  date_take_book timestamp,
+  overdue_delivery_date bool
 );
 
 insert into people (LNM, date_born) values ('Иванов Иван Иванович',1970);
